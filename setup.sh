@@ -176,7 +176,8 @@ function setupCrontab() {
     command3='sync; echo 1 > /proc/sys/vm/drop_caches'
     (crontab -l ; echo "$cron_schedule $command") | crontab -
     (crontab -l ; echo "$cron_schedule $command2") | crontab -
-    (crontab -l ; echo "$cron_schedule $command3") | crontab -     
+    (crontab -l ; echo "$cron_schedule $command3") | crontab -
+    echo "Setup Crontab thành công !"      
 }
 
 
