@@ -170,12 +170,13 @@ function setupSSHkey(){
 }
 
 function setupCrontab() {
-    cron_schedule="30 01 * * *"
+    cron_schedule1="01 * * * *"
+    cron_schedule3="01 * * * 01"
     command='sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"'
     command2='docker start $(docker container ls -q -f "status=exited")'
     command3='sync; echo 1 > /proc/sys/vm/drop_caches'
     (crontab -l ; echo "$cron_schedule $command") | crontab -
-    (crontab -l ; echo "$cron_schedule $command2") | crontab -
+    # (crontab -l ; echo "$cron_schedule $command2") | crontab -
     (crontab -l ; echo "$cron_schedule $command3") | crontab -
     echo "Setup Crontab thành công !"      
 }
