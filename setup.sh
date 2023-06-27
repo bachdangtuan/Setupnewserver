@@ -175,9 +175,9 @@ function setupCrontab() {
     command='sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"'
     command2='docker start $(docker container ls -q -f "status=exited")'
     command3='sync; echo 1 > /proc/sys/vm/drop_caches'
-    (crontab -l ; echo "$cron_schedule $command") | crontab -
+    (crontab -l ; echo "$cron_schedule1 $command") | crontab -
     # (crontab -l ; echo "$cron_schedule $command2") | crontab -
-    (crontab -l ; echo "$cron_schedule $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule3 $command3") | crontab -
     echo "Setup Crontab thành công !"      
 }
 
