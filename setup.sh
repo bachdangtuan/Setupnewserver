@@ -14,11 +14,7 @@ function ubuntu_basic_install()
 	sudo apt -y update	
 	sudo apt -y install git wget telnet rsync sysstat lsof nfs-common cifs-utils iptables chrony curl htop net-tools
 	timedatectl set-timezone Asia/Ho_Chi_Minh
-      ufw disable 
-	systemctl start chronyd
-	systemctl restart chronyd
-	chronyc sources
-	timedatectl set-local-rtc 0
+    ufw disable 
 }
 
 function centos_basic_install()
@@ -48,9 +44,12 @@ function centos_basic_install()
 # Setup new server
 function create_user()
 {   
-    #Delete user UID 1000
-    sudo userdel -r -f -Z uid 1000
-    useradd -ms /bin/bash isofh
+
+    username_1000=$(getent passwd 1000 | awk -F ':' '{print $1}')
+    sudo userdel -r -f $username_1000
+
+
+    sudo useradd -u 1000 -m -s /bin/bash isofh
     echo "isofh:123123" | chpasswd
     echo "isofh ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
@@ -126,18 +125,17 @@ function centos_docker_install()
 
 function runAgent(){
 sudo docker run -d \
-     --log-driver none \
-     --name node-exporter \
-     --net host \
-     --pid host \
-     --volume /proc:/host/proc \
-     --volume /sys:/host/sys \
-     --volume /:/rootfs \
-     --volume /etc/node-exporter:/etc/node-exporter \
-     prom/node-exporter \
-         --path.procfs /host/proc \
-         --path.sysfs /host/sys \
-         --collector.filesystem.ignored-mount-points "^/(sys|proc|host|etc)($|/)"
+    --name node-exporter-isofh \
+    --restart unless-stopped \
+    --publish 19100:9100 \
+    --volume /proc:/host/proc:ro \
+    --volume /sys:/host/sys:ro \
+    --volume /:/rootfs:ro \
+    prom/node-exporter:latest \
+    --path.procfs /host/proc \
+    --path.rootfs /rootfs \
+    --path.sysfs /host/sys \
+    --collector.filesystem.mount-points-exclude "^/(sys|proc|dev|host|etc)($$|/)"
 		 
 sudo docker run \
   --volume=/:/rootfs:ro \
@@ -145,13 +143,13 @@ sudo docker run \
   --volume=/sys:/sys:ro \
   --volume=/var/lib/docker/:/var/lib/docker:ro \
   --volume=/dev/disk/:/dev/disk:ro \
-  --publish=9092:8080 \
+  --publish=19092:8080 \
   --detach=true \
   --restart always \
-  --name=cadvisor \
+  --name=cadvisor-isofh \
   --privileged \
   --device=/dev/kmsg \
-  gcr.io/cadvisor/cadvisor:v0.37.5
+  gcr.io/cadvisor/cadvisor:latest
 }
 
 function setupSSHkey(){
@@ -169,16 +167,40 @@ function setupSSHkey(){
 
 }
 
+function createFileCrontab(){
+    mkdir -p /root/clearcache && touch clearcache.sh
+    echo "sync; echo 1 > /proc/sys/vm/drop_caches" >> /root/clearcache/clearcache.sh
+    echo "sync; echo 2 > /proc/sys/vm/drop_caches" >> /root/clearcache/clearcache.sh
+    echo "sync; echo 3 > /proc/sys/vm/drop_caches" >> /root/clearcache/clearcache.sh
+
+}
+
 function setupCrontab() {
+    createFileCrontab
     cron_schedule1="01 * * * *"
-    cron_schedule3="01 * * * 01"
+    cron_schedule2="01 * * * *"
+    cron_schedule3="06 * * * *"
+    cron_schedule4="09 * * * *"
+    cron_schedule5="10 * * * *"
+    cron_schedule6="12 * * * *"
+    cron_schedule7="15 * * * *" 
+    cron_schedule8="17 * * * *"
+    cron_schedule9="19 * * * *"
+
     command='sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"'
-    command2='docker start $(docker container ls -q -f "status=exited")'
-    command3='sync; echo 1 > /proc/sys/vm/drop_caches'
+    # command2='docker start $(docker container ls -q -f "status=exited")'
+    command3='bash /root/clearcache/clearcache.sh'
     (crontab -l ; echo "$cron_schedule1 $command") | crontab -
-    # (crontab -l ; echo "$cron_schedule $command2") | crontab -
+    (crontab -l ; echo "$cron_schedule1 $command3") | crontab -
     (crontab -l ; echo "$cron_schedule3 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule4 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule5 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule6 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule7 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule8 $command3") | crontab -
+    (crontab -l ; echo "$cron_schedule9 $command3") | crontab -
     echo "Setup Crontab thành công !"      
+
 }
 
 
