@@ -177,15 +177,15 @@ function createFileCrontab(){
 
 function setupCrontab() {
     createFileCrontab
-    cron_schedule1="01 * * * *"
-    cron_schedule2="01 * * * *"
-    cron_schedule3="06 * * * *"
-    cron_schedule4="09 * * * *"
-    cron_schedule5="10 * * * *"
-    cron_schedule6="12 * * * *"
-    cron_schedule7="15 * * * *" 
-    cron_schedule8="17 * * * *"
-    cron_schedule9="19 * * * *"
+    cron_schedule1="* 01 * * *"
+    cron_schedule2="* 03 * * *"
+    cron_schedule3="* 06 * * *"
+    cron_schedule4="* 09 * * *"
+    cron_schedule5="* 10 * * *"
+    cron_schedule6="* 12 * * *"
+    cron_schedule7="* 15 * * *" 
+    cron_schedule8="* 17 * * *"
+    cron_schedule9="* 19 * * *"
 
     command='sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"'
     # command2='docker start $(docker container ls -q -f "status=exited")'
