@@ -143,7 +143,7 @@ sudo docker run \
   --volume=/sys:/sys:ro \
   --volume=/var/lib/docker/:/var/lib/docker:ro \
   --volume=/dev/disk/:/dev/disk:ro \
-  --publish=19092:8080 \
+  --publish=19093:8080 \
   --detach=true \
   --restart always \
   --name=cadvisor-isofh \
