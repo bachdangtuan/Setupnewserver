@@ -12,7 +12,7 @@ echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 function ubuntu_basic_install()
 {
 	sudo apt -y update	
-	sudo apt -y install git wget telnet rsync sysstat lsof nfs-common cifs-utils iptables chrony curl htop net-tools
+	sudo apt -y install git wget telnet rsync sysstat traceroute lsof nfs-common ntp cifs-utils iptables curl htop net-tools
 	timedatectl set-timezone Asia/Ho_Chi_Minh
     ufw disable 
 }
